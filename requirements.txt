@@ -1,0 +1,4 @@
+PySimpleGUI==4.55.1
+pygame==2.0.1
+colorspy==0.4
+numpy==1.19.4
