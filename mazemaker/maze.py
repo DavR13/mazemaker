@@ -1,10 +1,15 @@
 import pygame
-import colorspy as colors
 import random
 import time
 import functools
-import disjoint_set
+import disjointset
 from maze_node import Node
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GRAY = (211, 211, 211)
+GREEN = (0, 128, 0)
+RED = (128, 0, 0)
 
 screen_width = 800
 win = pygame.display.set_mode((screen_width, screen_width), flags = pygame.HIDDEN)
@@ -72,12 +77,12 @@ def animate(grid, speed):
 def color_rg_spaces(grid):
     for row in grid:
         for node in row:
-            node.color = colors.white
+            node.color = WHITE
             node.current = False
             node.visited = False
 
-    grid[0][0].color = colors.green
-    grid[len(grid)-1][len(grid)-1].color = colors.red
+    grid[0][0].color = GREEN
+    grid[len(grid)-1][len(grid)-1].color = RED
     draw(win, grid)
 
 @timer
@@ -89,11 +94,14 @@ def binary_tree(grid, animation_speed):
     for row in grid:
         for node in row:
             node.current = True
-            new_dir = node.get_bin_dir(directions)
+            new_dir = random.choice(directions)
+            if new_dir not in node.valid_directions:
+                new_dir = random.choice(node.valid_directions)
+
             node.add_edge(grid, direction=new_dir)
             animate(grid, animation_speed)
             node.current = False
-            node.color = colors.white
+            node.color = WHITE
 
     color_rg_spaces(grid)
 
@@ -111,7 +119,7 @@ def aldous_broder(grid, animation_speed):
     while unvisited_nodes:
         current_node.current = True
         new_node = get_random_neighbor(grid, current_node)
-        new_node.color = colors.white
+        new_node.color = WHITE
         if new_node in unvisited_nodes:
             current_node.add_edge(grid, neighbor=new_node)
 
@@ -128,7 +136,7 @@ def aldous_broder(grid, animation_speed):
 def wilson(grid, animation_speed):
     start = None
     end = grid[random.randint(0,len(grid)-1)][random.randint(0,len(grid)-1)]
-    end.color = colors.red
+    end.color = RED
     maze = []
     unvisited_nodes = [node for row in grid for node in row]
 
@@ -184,7 +192,7 @@ def wilson(grid, animation_speed):
             for node in row:
                 node.visited = False
                 if node in maze:
-                    node.color = colors.white
+                    node.color = WHITE
 
 
     color_rg_spaces(grid)
@@ -247,11 +255,11 @@ def kruskal(grid, animation_speed):
     maze = []
 
     edges = [(node, neighbor) for node in node_list for neighbor in node.neighbors]
-    ds = disjoint_set.disjoint_set(node_list)
+    ds = disjointset.DisjointSet(node_list)
 
     while len(maze) < len(node_list) - 1:
         edge = edges.pop(random.randint(0, len(edges)-1))
-        edge[0].color = colors.white
+        edge[0].color = WHITE
         if ds.find(edge[0]) != ds.find(edge[1]):
             ds.union(edge[0], edge[1])
             edge[0].add_edge(grid, neighbor=edge[1])
@@ -281,7 +289,7 @@ def prim(grid, animation_speed):
         for node in frontier_nodes:
             node.color = (255, 255, 140)
         for node in maze:
-            node.color = colors.white
+            node.color = WHITE
         animate(grid, animation_speed)
         new_node = random.choice(frontier_nodes)
         bridge_node = None

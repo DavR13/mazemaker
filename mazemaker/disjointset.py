@@ -1,4 +1,4 @@
-class disjoint_set:
+class DisjointSet:
     def __init__(self, initList):
         self.node_mapping = {}
         for i,val in enumerate(initList):

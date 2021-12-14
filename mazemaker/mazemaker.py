@@ -36,16 +36,23 @@ left_col = [[sg.T('Animation Speed')],
 gui_buttons = [[sg.Button('Create Maze')],
                 [sg.Exit()]]
 
-layout = [[sg.Titlebar('MazeMaker')],
-          [sg.T(' '*10), sg.T('Select Maze Parameters', font=18, justification = 'center')],
-          [sg.Column(left_col, element_justification = 'center'), sg.Column(right_col, element_justification = 'center', vertical_alignment = 'top')],
-          [sg.Column(gui_buttons, element_justification = 'right', justification = 'right')]]
+gui_layout = [[sg.Titlebar('MazeMaker')],
+              [sg.T(' '*10), sg.T('Select Maze Parameters', font=18, justification = 'center')],
+              [sg.Column(left_col, element_justification = 'center'), sg.Column(right_col, element_justification = 'center', vertical_alignment = 'top')],
+              [sg.Column(gui_buttons, element_justification = 'right', justification = 'right')]]
 
-window = sg.Window('MazeMaker', layout)
+warning_layout = [[sg.Titlebar('Warning')],
+                  [sg.T("The algorithm you have selected is relatively slow and not suitable for the large grid.")],
+                  [sg.T("To view this algorithm on the medium grid, set Animation Speed to 'fast' or 'very fast'.")],
+                  [sg.T("To view this algorithm on the small grid set Animation Speed to 'medium', 'fast', or 'very fast'.")]]
 
 
-# # ------------------------ Integrates PyGame and Graph Element to Embed into single window------------------
-# graph = window[]           # type: sg.Graph
+gui_window = sg.Window('MazeMaker', gui_layout)
+warning_window = sg.Window('Warning', warning_layout)
+
+
+# # ------------------------ Integrates PyGame and Graph Element to Embed into single gui_window------------------
+# graph = gui_window[]           # type: sg.Graph
 # embed = graph.TKCanvas
 # os.environ['SDL_WINDOWID'] = str(embed.winfo_id())
 # os.environ['SDL_VIDEODRIVER'] = 'windib'
@@ -54,7 +61,7 @@ window = sg.Window('MazeMaker', layout)
 def main():
 
     while True:
-        event, values = window.read()
+        event, values = gui_window.read()
 
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
@@ -64,9 +71,14 @@ def main():
             speed = animation_speed_dict.get(values['LB-Speed'][0], list(animation_speed_dict.values())[0])
             size = grid_size_dict.get(values['LB-GridSize'][0], list(grid_size_dict.values())[0])
 
+            # if algo in ['wilson', 'aldous broder']:
+            #     print("ASDF")
+            #     if size == 25 or (size == 'Medium' and speed in ['Slow', 'Medium']) or (size == 'Small' and speed == 'Slow'):
+            #         warning_window.show()
+
             maze.run(algo, speed, size)
 
-    window.close()
+    gui_window.close()
 
 if __name__ == "__main__":
     main()
