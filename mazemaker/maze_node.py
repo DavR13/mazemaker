@@ -1,6 +1,9 @@
-import colorspy as colors
 import pygame
 import random
+
+BLACK = (0, 0, 0)
+GRAY = (211, 211, 211)
+YELLOW = (255, 255, 110)
 
 
 class Node:
@@ -10,15 +13,15 @@ class Node:
         self.width = width
         self.x = self.col * width
         self.y = self.row * width
-        self.edges = [] # stores nodes that share edge with this node
+        self.edges = []  # stores nodes that share edge with this node
         self.degree = len(self.edges)
         self.visited = False
         self.current = False
-        self.walls = [True, True, True, True] # [TOP, RIGHT, DOWN, LEFT]
+        self.walls = [True, True, True, True]  # [TOP, RIGHT, DOWN, LEFT]
         self.total_rows = total_rows
         self.valid_directions = self.get_valid_directions()
         self.neighbors = []
-        self.color = colors.black
+        self.color = BLACK
 
     def show(self, win):
         width = self.width
@@ -28,17 +31,17 @@ class Node:
         pygame.draw.rect(win, self.color, (x, y, width, width))
 
         if self.visited:
-            pygame.draw.rect(win, colors.light_gray, (x, y, width, width))
+            pygame.draw.rect(win, GRAY, (x, y, width, width))
         if self.current:
-            pygame.draw.rect(win, (255, 255, 140), (x, y, width, width))
+            pygame.draw.rect(win, YELLOW, (x, y, width, width))
         if self.walls[0]:
-            pygame.draw.line(win, colors.black, (x, y), (x+width, y))
+            pygame.draw.line(win, BLACK, (x, y), (x+width, y))
         if self.walls[1]:
-            pygame.draw.line(win, colors.black, (x+width, y), (x+width, y+width))
+            pygame.draw.line(win, BLACK, (x+width, y), (x+width, y+width))
         if self.walls[2]:
-            pygame.draw.line(win, colors.black, (x+width, y+width), (x, y+width))
+            pygame.draw.line(win, BLACK, (x+width, y+width), (x, y+width))
         if self.walls[3]:
-            pygame.draw.line(win, colors.black, (x, y+width), (x, y))
+            pygame.draw.line(win, BLACK, (x, y+width), (x, y))
 
     def get_valid_directions(self):
         valid_directions = ["up", "down", "left", "right"]
@@ -74,22 +77,22 @@ class Node:
 
             self.neighbors.append(new_neighbor)
 
-    def remove_walls(self, b):
-        x = self.col - b.col
+    def remove_walls(self, neighbor):
+        x = self.col - neighbor.col
         if x == 1:
             self.walls[3] = False
-            b.walls[1] = False
+            neighbor.walls[1] = False
         elif x == -1:
             self.walls[1] = False
-            b.walls[3] = False
+            neighbor.walls[3] = False
 
-        y = self.row - b.row
+        y = self.row - neighbor.row
         if y == 1:
             self.walls[0] = False
-            b.walls[2] = False
+            neighbor.walls[2] = False
         elif y == -1:
             self.walls[2] = False
-            b.walls[0] = False
+            neighbor.walls[0] = False
 
     def add_edge(self, grid, direction=None, neighbor=None):
 
@@ -115,35 +118,3 @@ class Node:
         new_neighbor.degree += 1
         self.edges.append(new_neighbor)
         self.degree += 1
-
-    def get_bin_dir(self, directions):
-
-        direction = random.choice(directions)
-
-        if direction == "down" and self.row == self.total_rows - 1:
-            if self.col == 0:
-                return "right"
-            else:
-                return "left"
-
-        elif direction == "up" and self.row == 0:
-            if self.col == 0:
-                return "right"
-            else:
-                return "left"
-
-        elif direction == "left" and self.col == 0:
-            if self.row == 0:
-                return "down"
-            else:
-                return "up"
-
-
-        elif direction == "right" and self.col == self.total_rows - 1:
-            if self.row == 0:
-                return "down"
-            else:
-                return "up"
-
-        else:
-            return direction
