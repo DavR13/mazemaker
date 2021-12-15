@@ -12,7 +12,7 @@ GREEN = (0, 128, 0)
 RED = (128, 0, 0)
 
 screen_width = 800
-win = pygame.display.set_mode((screen_width, screen_width), flags = pygame.HIDDEN)
+win = pygame.display.set_mode((screen_width, screen_width), flags=pygame.HIDDEN)
 
 
 def timer(func):
@@ -74,6 +74,7 @@ def animate(grid, speed):
     time.sleep(speed)
     draw(win, grid)
 
+
 def color_rg_spaces(grid):
     for row in grid:
         for node in row:
@@ -84,6 +85,7 @@ def color_rg_spaces(grid):
     grid[0][0].color = GREEN
     grid[len(grid)-1][len(grid)-1].color = RED
     draw(win, grid)
+
 
 @timer
 def binary_tree(grid, animation_speed):
@@ -103,7 +105,12 @@ def binary_tree(grid, animation_speed):
             node.current = False
             node.color = WHITE
 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
+
     color_rg_spaces(grid)
+
 
 @timer
 def aldous_broder(grid, animation_speed):
@@ -122,20 +129,23 @@ def aldous_broder(grid, animation_speed):
         new_node.color = WHITE
         if new_node in unvisited_nodes:
             current_node.add_edge(grid, neighbor=new_node)
-
             unvisited_nodes.remove(new_node)
 
         animate(grid, animation_speed)
         current_node.current = False
         current_node = new_node
 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
+
     color_rg_spaces(grid)
 
 
 @timer
 def wilson(grid, animation_speed):
-    start = None
-    end = grid[random.randint(0,len(grid)-1)][random.randint(0,len(grid)-1)]
+
+    end = grid[random.randint(0, len(grid)-1)][random.randint(0, len(grid)-1)]
     end.color = RED
     maze = []
     unvisited_nodes = [node for row in grid for node in row]
@@ -145,11 +155,7 @@ def wilson(grid, animation_speed):
 
     while unvisited_nodes:
 
-        while start not in unvisited_nodes:
-            start_row = random.randint(0, len(grid) - 1)
-            start_col = random.randint(0, len(grid) - 1)
-            start = grid[start_row][start_col]
-
+        start = random.choice(unvisited_nodes)
         current_node = start
 
         while current_node not in maze:
@@ -159,6 +165,10 @@ def wilson(grid, animation_speed):
             animate(grid, animation_speed)
             current_node.current = False
             current_node = new_node
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
 
         builder_node = None
         maze.append(start)
@@ -184,6 +194,8 @@ def wilson(grid, animation_speed):
             current_node.add_edge(grid, direction=direction)
             current_node = builder_node
 
+
+
         for node in maze:
             if node in unvisited_nodes:
                 unvisited_nodes.remove(node)
@@ -195,7 +207,9 @@ def wilson(grid, animation_speed):
                     node.color = WHITE
 
 
+
     color_rg_spaces(grid)
+
 
 @timer
 def hunt_and_kill(grid, animation_speed):
@@ -230,8 +244,11 @@ def hunt_and_kill(grid, animation_speed):
                     animate(grid, animation_speed)
                     break
 
-    color_rg_spaces(grid)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
 
+    color_rg_spaces(grid)
 
 
 def rec_backtrack(curr_row, curr_col, grid, animation_speed):
@@ -265,8 +282,11 @@ def kruskal(grid, animation_speed):
             edge[0].add_edge(grid, neighbor=edge[1])
             maze.append(edge)
 
-
         animate(grid, animation_speed)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
 
     color_rg_spaces(grid)
 
@@ -296,7 +316,7 @@ def prim(grid, animation_speed):
         while not bridge_node:
             bridge_node = random.choice(new_node.neighbors)
             if bridge_node in maze:
-                new_node.add_edge(grid, neighbor = bridge_node)
+                new_node.add_edge(grid, neighbor=bridge_node)
                 maze.add(new_node)
                 frontier_nodes.remove(new_node)
                 for neighbor in new_node.neighbors:
@@ -306,14 +326,19 @@ def prim(grid, animation_speed):
             else:
                 bridge_node = None
 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
+
     color_rg_spaces(grid)
 
 
 def run(algo, animation_speed, rows):
-    grid = make_grid(rows, screen_width)
 
+    grid = make_grid(rows, screen_width)
     pygame.display.set_caption("Maze Generator")
     pygame.display.set_mode((screen_width, screen_width), flags=pygame.SHOWN)
+    running = True
 
     if algo == 'binary tree':
         binary_tree(grid, animation_speed)
@@ -323,6 +348,7 @@ def run(algo, animation_speed, rows):
 
     elif algo == 'wilson':
         wilson(grid, animation_speed)
+
 
     elif algo == 'hunt and kill':
         hunt_and_kill(grid, animation_speed)
@@ -340,13 +366,13 @@ def run(algo, animation_speed, rows):
     elif algo == 'kruskal':
         kruskal(grid, animation_speed)
 
-    running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                pygame.display.set_mode(flags=pygame.HIDDEN)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
-                pygame.display.set_mode(flags=pygame.HIDDEN)
+
+    pygame.display.set_mode(flags=pygame.HIDDEN)

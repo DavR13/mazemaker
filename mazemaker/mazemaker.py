@@ -1,3 +1,5 @@
+# TODO: Add warning if user chooses aldous-broder or wilsons
+
 import PySimpleGUI as sg
 import maze
 
@@ -23,10 +25,8 @@ grid_size_dict = {'Small': 8,
                   'Medium': 16,
                   'Large': 25}
 
-
 right_col = [[sg.T('Algorithm')],
-            [sg.Listbox(list(algorithm_dict), default_values=[list(algorithm_dict)[0]], size=(20, 7), key='LB-Algo')]]
-
+             [sg.Listbox(list(algorithm_dict), default_values=[list(algorithm_dict)[0]], size=(20, 7), key='LB-Algo')]]
 
 left_col = [[sg.T('Animation Speed')],
             [sg.Listbox(list(reversed(animation_speed_dict)), default_values=[list(animation_speed_dict)[4]], size=(10, 4), key='LB-Speed')],
@@ -34,18 +34,18 @@ left_col = [[sg.T('Animation Speed')],
             [sg.Listbox(list(grid_size_dict), default_values=[list(grid_size_dict)[0]], size=(10, 3), key='LB-GridSize')]]
 
 gui_buttons = [[sg.Button('Create Maze')],
-                [sg.Exit()]]
+               [sg.Exit()]]
 
 gui_layout = [[sg.Titlebar('MazeMaker')],
-              [sg.T(' '*10), sg.T('Select Maze Parameters', font=18, justification = 'center')],
-              [sg.Column(left_col, element_justification = 'center'), sg.Column(right_col, element_justification = 'center', vertical_alignment = 'top')],
-              [sg.Column(gui_buttons, element_justification = 'right', justification = 'right')]]
+              [sg.T(' ' * 10), sg.T('Select Maze Parameters', font=18, justification='center')],
+              [sg.Column(left_col, element_justification='center'),
+               sg.Column(right_col, element_justification='center', vertical_alignment='top')],
+              [sg.Column(gui_buttons, element_justification='right', justification='right')]]
 
 warning_layout = [[sg.Titlebar('Warning')],
                   [sg.T("The algorithm you have selected is relatively slow and not suitable for the large grid.")],
                   [sg.T("To view this algorithm on the medium grid, set Animation Speed to 'fast' or 'very fast'.")],
                   [sg.T("To view this algorithm on the small grid set Animation Speed to 'medium', 'fast', or 'very fast'.")]]
-
 
 gui_window = sg.Window('MazeMaker', gui_layout)
 warning_window = sg.Window('Warning', warning_layout)
@@ -59,14 +59,13 @@ warning_window = sg.Window('Warning', warning_layout)
 
 
 def main():
-
     while True:
         event, values = gui_window.read()
 
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
 
-        if event == 'Create Maze':
+        elif event == 'Create Maze':
             algo = algorithm_dict.get(values['LB-Algo'][0], list(algorithm_dict.values())[0])
             speed = animation_speed_dict.get(values['LB-Speed'][0], list(animation_speed_dict.values())[0])
             size = grid_size_dict.get(values['LB-GridSize'][0], list(grid_size_dict.values())[0])
@@ -78,7 +77,11 @@ def main():
 
             maze.run(algo, speed, size)
 
+        else:
+            continue
+
     gui_window.close()
+
 
 if __name__ == "__main__":
     main()
